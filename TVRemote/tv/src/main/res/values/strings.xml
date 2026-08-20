@@ -1,0 +1,4 @@
+<resources>
+<string name="app_name">TV Remote Receiver</string>
+<string name="accessibility_description">TV Remote uses accessibility gestures to control the TV cursor and interact with apps.</string>
+</resources>

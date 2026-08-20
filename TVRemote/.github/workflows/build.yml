@@ -1,0 +1,47 @@
+name: Build TV Remote APKs
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK
+        run: |
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Build signed test APKs
+        working-directory: TVRemote
+        run: |
+          gradle --no-daemon :mobile:assembleDebug :tv:assembleDebug
+
+      - name: Collect APKs
+        run: |
+          mkdir -p artifacts
+          cp TVRemote/mobile/build/outputs/apk/debug/mobile-debug.apk artifacts/TVRemote-Mobile.apk
+          cp TVRemote/tv/build/outputs/apk/debug/tv-debug.apk artifacts/TVRemote-TV.apk
+
+      - name: Upload APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: tv-remote-apks
+          path: artifacts/
+          retention-days: 14
